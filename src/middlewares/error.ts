@@ -11,13 +11,11 @@ export function errorHandler(err: Error | HTTPResponseError, c: Context) {
 		const statusCode = err.status as HttpErrorStatusCode;
 		return c.json<GenericResponse<string>>(
 			{
-				error: {
-					code: err.status,
-					details: err.message,
-					message: HttpErrorPhrases[statusCode],
-					stack:
-                        env.NODE_ENV === 'production' ? undefined : err.stack,
-				},
+				code: err.status,
+				data: err.message,
+				message: HttpErrorPhrases[statusCode],
+				stack:
+					env.NODE_ENV === 'production' ? undefined : err.stack,
 				status: 'error',
 			},
 			err.status,
@@ -25,12 +23,10 @@ export function errorHandler(err: Error | HTTPResponseError, c: Context) {
 	}
 
 	return c.json<GenericResponse<string>>({
-		error: {
-			code: HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR,
-			details: err.message,
-			message: HttpErrorPhrases[HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR],
-			stack: err.stack,
-		},
+		code: HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR,
+		data: err.message,
+		message: HttpErrorPhrases[HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR],
+		stack: err.stack,
 		status: 'error',
 	});
 }

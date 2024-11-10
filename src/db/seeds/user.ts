@@ -8,8 +8,8 @@ export const seed = async (length: number) => {
 		await db
 			.insert(schema.user)
 			.values({
-				email: faker.internet.email(),
 				name: faker.person.fullName(),
+				email: faker.internet.email(),
 				emailVerifiedAt: Date.now(),
 				password: await argon2.hash('password'),
 				phone: faker.phone.number(),

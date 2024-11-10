@@ -13,3 +13,11 @@ export const paginationResponseSchema = <T>(results: z.ZodType<T>) => {
 		results: z.array(results),
 	});
 };
+
+export const errorResponseSchema = <T>(messages: string, schema: z.ZodType<T>) => {
+	return z.object({
+		data: schema.optional(),
+		message: z.string().openapi({ example: messages }),
+		status: z.literal('error'),
+	});
+};

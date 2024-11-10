@@ -8,11 +8,9 @@ const defaultHook: Hook<any, any, any, any> = (result, c) => {
 	if (!result.success) {
 		return c.json<GenericResponse<string>>(
 			{
-				error: {
-					code: HTTP_STATUS_CODE.UNPROCESSABLE_ENTITY,
-					details: result.error.flatten().fieldErrors,
-					message: HttpErrorPhrases[HTTP_STATUS_CODE.UNPROCESSABLE_ENTITY],
-				},
+				code: HTTP_STATUS_CODE.UNPROCESSABLE_ENTITY,
+				data: result.error.flatten().fieldErrors,
+				message: HttpErrorPhrases[HTTP_STATUS_CODE.UNPROCESSABLE_ENTITY],
 				status: 'error',
 			},
 			HTTP_STATUS_CODE.UNPROCESSABLE_ENTITY,
