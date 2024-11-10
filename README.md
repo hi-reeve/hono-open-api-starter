@@ -1,26 +1,25 @@
 # Hono Open API Starter
 
 A starter template for building fully documented type-safe JSON APIs with Hono and Open API.
-
-> A new version of drizzle was released since the video showing this starter was made. See the [drizzle-v0.35 branch](https://github.com/w3cj/hono-open-api-starter/tree/drizzle-v0.35) and [this commit](https://github.com/w3cj/hono-open-api-starter/commit/92525ff84fb2a247c8245cc889b2320d7b3b6e2c) for the changes required to use drizzle v0.35
+forked from [hono-open-api-starter](https://github.com/w3cj/hono-open-api-starter)
 
 > For a cloudflare specific template, see the [cloudflare branch](https://github.com/w3cj/hono-open-api-starter/tree/cloudflare) on this repo and the [cloudflare-drizzle-v0.35 branch](https://github.com/w3cj/hono-open-api-starter/tree/cloudflare-drizzle-v0.35)
 
 > For other deployment examples see the [hono-node-deployment-examples](https://github.com/w3cj/hono-node-deployment-examples) repo
 
-- [Hono Open API Starter](#hono-open-api-starter)
-  - [Included](#included)
-  - [Setup](#setup)
-  - [Code Tour](#code-tour)
-  - [Endpoints](#endpoints)
-  - [References](#references)
+1. [Hono Open API Starter](#hono-open-api-starter)
+	1. [Included](#included)
+	2. [Setup](#setup)
+	3. [Code Tour](#code-tour)
+	4. [Endpoints](#endpoints)
+	5. [References](#references)
 
 ## Included
 
 - Structured logging with [pino](https://getpino.io/) / [hono-pino](https://www.npmjs.com/package/hono-pino)
 - Documented / type-safe routes with [@hono/zod-openapi](https://github.com/honojs/middleware/tree/main/packages/zod-openapi)
 - Interactive API documentation with [scalar](https://scalar.com/#api-docs) / [@scalar/hono-api-reference](https://github.com/scalar/scalar/tree/main/packages/hono-api-reference)
-- Convenience methods / helpers to reduce boilerplate with [stoker](https://www.npmjs.com/package/stoker)
+- JSend standard response schema [jsend](https://github.com/omniti-labs/jsend)
 - Type-safe schemas and environment variables with [zod](https://zod.dev/)
 - Single source of truth database schemas with [drizzle](https://orm.drizzle.team/docs/overview) and [drizzle-zod](https://orm.drizzle.team/docs/zod)
 - Testing with [vitest](https://vitest.dev/)
@@ -31,7 +30,7 @@ A starter template for building fully documented type-safe JSON APIs with Hono a
 Clone this template without git history
 
 ```sh
-npx degit w3cj/hono-open-api-starter my-api
+npx degit hi-reeve/hono-open-api-starter my-api
 cd my-api
 ```
 
@@ -47,7 +46,7 @@ Install dependencies
 pnpm install
 ```
 
-Create sqlite db / push schema
+Create postgres db / push schema
 
 ```sh
 pnpm drizzle-kit push
@@ -77,26 +76,15 @@ Base hono app exported from [app.ts](./src/app.ts). Local development uses [@hon
 
 Typesafe env defined in [env.ts](./src/env.ts) - add any other required environment variables here. The application will not start if any required environment variables are missing
 
-See [src/routes/tasks](./src/routes/tasks/) for an example Open API group. Copy this folder / use as an example for your route groups.
-
-- Router created in [tasks.index.ts](./src/routes/tasks/tasks.index.ts)
-- Route definitions defined in [tasks.routes.ts](./src/routes/tasks/tasks.routes.ts)
-- Hono request handlers defined in [tasks.handlers.ts](./src/routes/tasks/tasks.handlers.ts)
-- Group unit tests defined in [tasks.test.ts](./src/routes/tasks/tasks.test.ts)
-
 All app routes are grouped together and exported into single type as `AppType` in [app.ts](./src/app.ts) for use in [RPC / hono/client](https://hono.dev/docs/guides/rpc).
 
 ## Endpoints
 
-| Path               | Description              |
-| ------------------ | ------------------------ |
-| GET /doc           | Open API Specification   |
-| GET /reference     | Scalar API Documentation |
-| GET /tasks         | List all tasks           |
-| POST /tasks        | Create a task            |
-| GET /tasks/{id}    | Get one task by id       |
-| PATCH /tasks/{id}  | Patch one task by id     |
-| DELETE /tasks/{id} | Delete one task by id    |
+| Path            | Description              |
+| --------------- | ------------------------ |
+| GET /docs       | Open API Specification   |
+| GET /references | Scalar API Documentation |
+| GET /           | Api Welcome Index        |
 
 ## References
 
