@@ -1,3 +1,4 @@
+
 import { HTTP_STATUS_CODE } from '~/utils/http-status-codes';
 
 export const ERROR_MESSAGES = {
@@ -33,6 +34,12 @@ export const ERROR_MESSAGES = {
 		ISSUED_AT: 'error.token.issued-at',
 		NOT_BEFORE: 'error.token.not-before',
 		SIGNATURE_MISMATCH: 'error.token.signature-mismatch',
+	},
+	USER: {
+		CONFIRMATION_CODE_INVALID: 'error.user.confirmation-code-invalid',
+		EMAIL_ALREADY_VERIFIED: 'error.user.email-already-verified',
+		FAIL_TO_CREATE: 'error.user.fail-to-create',
+		FAIL_TO_UPDATE: 'error.user.fail-to-update',
 	},
 } as const;
 

@@ -1,6 +1,6 @@
 import type { TokenHeader } from 'hono/utils/jwt/jwt';
 import type { JWTPayload as JWTDefaultPayload } from 'hono/utils/jwt/types';
-import { addHours } from 'date-fns';
+import { addDays, addHours } from 'date-fns';
 import { sign } from 'hono/jwt';
 import { AlgorithmTypes } from 'hono/utils/jwt/jwa';
 import { verifying } from 'hono/utils/jwt/jws';
@@ -19,26 +19,40 @@ export type JwtPayload = JWTDefaultPayload & {
 	aud?: string;
 };
 
-export const generateToken = async (payload: JwtPayload) => {
+export const generateAccessAndRefreshToken = async (payload: JwtPayload) => {
 	const now = Math.round(Date.now() / 1000);
-	const exp = Math.round(addHours(new Date(), 2).getTime() / 1000);
+	const exp = Math.round(addHours(now, 2).getTime());
+	const refreshTokenExp = Math.round(addDays(now, 1).getTime());
 	const jti = nanoid();
-	const token = await sign(
+	const _payload = {
+		...payload,
+		aud: env.JWT_AUDIENCE,
+		exp,
+		iat: now,
+		iss: env.JWT_ISSUER,
+		jti,
+		nbf: now,
+	};
+	const access_token = await sign(
+		_payload,
+		env.JWT_SECRET,
+		'HS256',
+	);
+	const refresh_token = await sign(
 		{
-			...payload,
-			aud: env.JWT_AUDIENCE,
-			exp,
-			iat: now,
-			iss: env.JWT_ISSUER,
-			jti,
-			nbf: now,
+			..._payload,
+			exp: refreshTokenExp,
 		},
 		env.JWT_SECRET,
 		'HS256',
 	);
-	redis.set(jti, token);
+	await redis.set(`access_token:${jti}`, access_token);
+	await redis.set(`refresh_token:${jti}`, refresh_token);
 
-	return token;
+	return {
+		access_token,
+		refresh_token,
+	};
 };
 const decodeJwtPart = (part: string): TokenHeader | JwtPayload | undefined =>
 	JSON.parse(new TextDecoder().decode(decodeBase64Url(part)));
@@ -80,19 +94,27 @@ export function isTokenHeader(obj: unknown): obj is TokenHeader {
 }
 
 export const revokeToken = async (jti?: string) => {
-	if (jti)
-		await redis.del(jti);
+	if (jti) {
+		await redis.del(`access_token:${jti}`);
+		await redis.del(`refresh_token:${jti}`);
+	}
 };
 
-export const isTokenRevoked = async (token: string) => {
+export const isTokenRevoked = async (token: string, isRefresh = false) => {
 	const jti = getTokenPayload(token).jti;
+
 	if (!jti)
 		return true;
 
-	const isExist = await redis.get(jti);
+	if (isRefresh) {
+		const isExist = await redis.get(`refresh_token:${jti}`);
+		return !isExist;
+	}
+
+	const isExist = await redis.get(`access_token:${jti}`);
 	return !isExist;
 };
-export const verifyToken = async (token: string) => {
+export const verifyToken = async (token: string, isRefresh = false) => {
 	const tokenParts = token.split('.');
 	const publicKey = env.JWT_SECRET;
 	const alg = 'HS256';
@@ -112,7 +134,7 @@ export const verifyToken = async (token: string) => {
 		);
 	}
 
-	const isRevoked = await isTokenRevoked(token);
+	const isRevoked = await isTokenRevoked(token, isRefresh);
 	if (isRevoked) {
 		throw new HttpException(
 			HTTP_STATUS_CODE.UNAUTHORIZED,
