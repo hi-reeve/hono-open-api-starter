@@ -1,6 +1,6 @@
 import { createApp } from '~/libs/create-app';
 import { defineOpenApi } from '~/libs/define-open-api';
-import { appRouter } from './modules/app/app.router';
+import { appRouter } from './modules/app/app.routes';
 
 const app = createApp();
 
